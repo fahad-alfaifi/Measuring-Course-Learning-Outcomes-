@@ -1,0 +1,112 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+const Record = (props) => (
+  <tr>
+    <td>{props.record.CLO}</td>
+    <td>{props.record.CLO_Domain}</td>
+    <td>{props.record.Assign1}</td>
+    <td>{props.record.Assign2}</td>
+    <td>{props.record.Quiz1}</td>
+    <td>{props.record.Quiz2}</td>
+    <td>{props.record.Mid1}</td>
+    <td>{props.record.Mid2}</td>
+    <td>{props.record.LAB}</td>
+    <td>{props.record.Final}</td>
+
+    <td>
+    
+   
+      <Link className="btn btn-link" to={`/EditMark/${props.record._id}`}>Edit</Link> |
+      <button className="btn btn-link"
+        onClick={() => {
+          props.deleteRecord(props.record._id);
+        }}
+      >
+        Delete
+      </button>
+    </td>
+  </tr>
+
+  
+);
+
+export default function ClosList() {
+  const [records, setRecords] = useState([]);
+
+  // This method fetches the records from the database.
+  useEffect(() => {
+    async function getRecords() {
+      const response = await fetch(`http://localhost:3000/recordClos/`);
+
+      if (!response.ok) {
+        const message = `An error occured: ${response.statusText}`;
+        window.alert(message);
+        return;
+      }
+
+      const records = await response.json();
+      setRecords(records);
+    }
+
+    getRecords();
+
+    return; 
+  }, [records.length]);
+
+  // This method will delete a record
+  async function deleteRecord(id) {
+    await fetch(`http://localhost:3000/recordClos/${id}`, {
+      method: "DELETE"
+    });
+
+    const newRecords = records.filter((el) => el._id !== id);
+    setRecords(newRecords);
+  }
+
+  // This method will map out the records on the table
+  function ClosList() {
+    return records.map((record) => {
+      return (
+        <Record
+          record={record}
+          deleteRecord={() => deleteRecord(record._id)}
+          key={record._id}
+        />
+      );
+    });
+  }
+
+
+
+
+  // This following section will display the table with the records of individuals.
+  return (
+    <div>
+   
+      <table className="table table-striped" style={{  width:1100, marginTop: 30 ,marginLeft:250 }}>
+        <thead>
+          <tr >
+            <th>CLO</th>
+            <th>Domain</th>
+            <th>Assign-1</th>
+            <th>Assign-2 </th>
+            <th>Quiz-1 </th>
+            <th>Quiz-2 </th>
+            <th>Mid-1 </th>
+            <th>Mid-2 </th>
+            <th>Final </th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>{ClosList()}</tbody>
+      </table>
+       
+    </div>
+
+    
+  );
+}
+
+
+
